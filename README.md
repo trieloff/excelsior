@@ -1,4 +1,4 @@
-# excelisior
+# Excelsior
 Turn Excel into HTTP
 
 

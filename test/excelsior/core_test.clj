@@ -5,3 +5,7 @@
 (deftest a-test
   (testing "FIXME, I fail."
     (is (= 0 1))))
+
+(use 'dk.ative.docjure.spreadsheet)
+
+(-> (load-workbook "resources/helloworld.xlsx") (select-name "Sheet1"))

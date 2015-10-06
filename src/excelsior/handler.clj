@@ -1,12 +1,49 @@
 (ns excelsior.handler
   (:require [compojure.api.sweet :refer :all]
             [ring.util.http-response :refer :all]
+            [taoensso.faraday :as far]
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
 (s/defschema Spreadsheet {:input {s/Keyword (s/either Long String)}
-                          :meta {:customer String :spreadsheet String}
+                          :meta {:customer String :spreadsheet String :name String :id String :url String :type String :output #{String} :inputs #{String}}
                           :output {s/Keyword (s/either Long String)}})
+
+(def client-opts
+  {;;; For DDB Local just use some random strings here, otherwise include your
+   ;;; production IAM keys:
+   :access-key "<AWS_DYNAMODB_ACCESS_KEY>"
+   :secret-key "<AWS_DYNAMODB_SECRET_KEY>"
+
+   ;;; You may optionally override the default endpoint if you'd like to use DDB
+   ;;; Local or a different AWS Region (Ref. http://goo.gl/YmV80o), etc.:
+   :endpoint "http://localhost:8000"                   ; For DDB Local
+   ;; :endpoint "http://dynamodb.eu-west-1.amazonaws.com" ; For EU West 1 AWS region
+   })
+
+(def crypt-opts {:password [:salted "foobar"]})
+
+(far/ensure-table client-opts :spreadsheets
+                  [:id :s]  ; Primary key named "id", (:n => number type)
+                  {:throughput {:read 1 :write 1} ; Read & write capacity (units/sec)
+                   :block? true ; Block thread during table creation
+                   })
+
+
+(far/list-tables client-opts)
+
+(far/put-item client-opts
+              :spreadsheets
+              {:id "hans/help"
+               :name "example.xls"
+               :url "file:///Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
+               :type "local"
+               :inputs (far/freeze #{"A1", "A2"} crypt-opts)
+               :output (far/freeze #{"B1" "B2"} crypt-opts)})
+
+(far/get-item client-opts
+              :spreadsheets
+              {:id "0"})
 
 (defapi app
   (swagger-ui)
@@ -21,7 +58,12 @@
                   :return Spreadsheet
                   :path-params [customer :- String spreadsheet :- String]
                   :summary "calculate the response value"
-                  (ok {:input (:params request) :meta {:customer customer :spreadsheet spreadsheet} :output {:request (str (:params request))}})))
+                  (ok {:input (:params request)
+                       :meta (merge
+                              {:customer customer :spreadsheet spreadsheet }
+                              (far/with-thaw-opts crypt-opts (far/get-item client-opts
+                                            :spreadsheets {:id (str customer "/" spreadsheet)})))
+                       :output {:request (str (:params request))}})))
   (context* "/hello" []
     :tags ["hello"]
     (GET* "/" []

@@ -143,7 +143,7 @@
     </object>
     <object type="LMREQUEST" id="z111">
         <attribute name="uuid" type="string">D2BF1EFD-CB0A-47D5-9A7D-3FDE612675BE</attribute>
-        <attribute name="url" type="string">http://localhost:3000/formula/hans/help?A1=Foo\u2600A2=Bar</attribute>
+        <attribute name="url" type="string">http://localhost:3000/formula/hans/help?A1=Foo\u2600B1=2</attribute>
         <attribute name="storecookies" type="bool">1</attribute>
         <attribute name="sendcookies" type="bool">1</attribute>
         <attribute name="redirectmethod" type="bool">0</attribute>

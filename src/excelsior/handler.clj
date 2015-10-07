@@ -2,6 +2,7 @@
   (:require [compojure.api.sweet :refer :all]
             [ring.util.http-response :refer :all]
             [taoensso.faraday :as far]
+            [dk.ative.docjure.spreadsheet :as doc]
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
@@ -38,12 +39,34 @@
                :name "example.xls"
                :url "file:///Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
                :type "local"
-               :inputs (far/freeze #{"A1", "A2"} crypt-opts)
-               :output (far/freeze #{"B1" "B2"} crypt-opts)})
+               :inputs (far/freeze #{"A1", "B1"} crypt-opts)
+               :output (far/freeze #{"C1" "C2"} crypt-opts)})
 
 (far/get-item client-opts
               :spreadsheets
               {:id "0"})
+
+(def formula-from-sheet
+  (doc/cell-fn "C1"
+               (first (doc/sheet-seq (doc/load-workbook "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx")))
+               "A1"))
+
+(formula-from-sheet "Hund")
+
+(def inputs #{"A2" "A1"})
+(def outputs #{"C2" "C1"})
+(def params {:A2 12 :A1 "Katze"})
+
+(defn sheet-formulas [inputs outputs sheet]
+  (into (hash-map) (map #(conj
+                          (vector (keyword %))
+                          (apply doc/cell-fn % (first (doc/sheet-seq (doc/load-workbook sheet))) (sort inputs))) (sort outputs))))
+
+(def fnmap (sheet-formulas inputs outputs "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"))
+
+(def values (vals (into (sorted-map) params)))
+
+(zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))
 
 (defapi app
   (swagger-ui)
@@ -63,7 +86,7 @@
                               {:customer customer :spreadsheet spreadsheet }
                               (far/with-thaw-opts crypt-opts (far/get-item client-opts
                                             :spreadsheets {:id (str customer "/" spreadsheet)})))
-                       :output {:request (str (:params request))}})))
+                       :output {:C1 (formula-from-sheet "Nase")}})))
   (context* "/hello" []
     :tags ["hello"]
     (GET* "/" []

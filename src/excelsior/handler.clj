@@ -81,12 +81,20 @@
                   :return Spreadsheet
                   :path-params [customer :- String spreadsheet :- String]
                   :summary "calculate the response value"
-                  (ok {:input (:params request)
+                  (ok (let
+                        [meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
+                                            :spreadsheets {:id (str customer "/" spreadsheet)}))
+                         inputs   (:inputs meta)
+                         outputs  (:output meta)
+                         params   (:params request)
+                         sheet    (:url meta)
+                         fnmap    (sheet-formulas inputs outputs sheet)
+                         values   (vals (into (sorted-map) params))]
+                        {:input (:params request)
                        :meta (merge
                               {:customer customer :spreadsheet spreadsheet }
-                              (far/with-thaw-opts crypt-opts (far/get-item client-opts
-                                            :spreadsheets {:id (str customer "/" spreadsheet)})))
-                       :output {:C1 (formula-from-sheet "Nase")}})))
+                              meta)
+                       :output (zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))}))))
   (context* "/hello" []
     :tags ["hello"]
     (GET* "/" []

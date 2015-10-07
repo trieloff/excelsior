@@ -37,7 +37,7 @@
               :spreadsheets
               {:id "hans/help"
                :name "example.xls"
-               :url "file:///Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
+               :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
                :type "local"
                :inputs (far/freeze #{"A1", "B1"} crypt-opts)
                :output (far/freeze #{"C1" "C2"} crypt-opts)})

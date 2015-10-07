@@ -62,12 +62,6 @@
                           (vector (keyword %))
                           (apply doc/cell-fn % (first (doc/sheet-seq (doc/load-workbook sheet))) (sort inputs))) (sort outputs))))
 
-(def fnmap (sheet-formulas inputs outputs "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"))
-
-(def values (vals (into (sorted-map) params)))
-
-(zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))
-
 (defapi app
   (swagger-ui)
   (swagger-docs

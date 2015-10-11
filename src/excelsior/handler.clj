@@ -2,12 +2,15 @@
   (:require [compojure.api.sweet :refer :all]
             [ring.util.http-response :refer :all]
             [taoensso.faraday :as far]
+            [clojure.string :as str]
             [dk.ative.docjure.spreadsheet :as doc]
+            [ring.swagger.json-schema :as js]
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
+(s/defschema Meta {:customer String :spreadsheet String :name String :id String :url String :type String :output #{String} :inputs #{String}})
 (s/defschema Spreadsheet {:input {s/Keyword (s/either Long String)}
-                          :meta {:customer String :spreadsheet String :name String :id String :url String :type String :output #{String} :inputs #{String}}
+                          :meta Meta
                           :output {s/Keyword (s/either Long String)}})
 
 (def client-opts
@@ -88,7 +91,15 @@
                        :meta (merge
                               {:customer customer :spreadsheet spreadsheet }
                               meta)
-                       :output (zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))}))))
+                       :output (zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))})))
+            (POST* "/:customer/*" []
+                   :return Message
+                   :path-params [customer :- String]
+                   ;:form-params [inputs :- (s/either s/Str [s/Str]) outputs :- (s/either s/Str [s/Str]) name :- String]
+                   ;:body-params [inputs :- [s/Str] outputs :- [s/Str] name :- String]
+                   :form-params [x :- (js/field [String] {:collectionFormat "multi"})]
+                   :summary "Create a new spreadsheet"
+                   (ok {:message (str "Hello?" x)})))
   (context* "/hello" []
     :tags ["hello"]
     (GET* "/" []

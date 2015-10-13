@@ -8,7 +8,7 @@
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
-(s/defschema Meta {:customer String :spreadsheet String :name String :id String :url String :type String :output #{String} :inputs #{String}})
+(s/defschema Meta {:customer String :spreadsheet String :name String :url String :type String :output #{String} :inputs #{String}})
 (s/defschema Spreadsheet {:input {s/Keyword (s/either Long String)}
                           :meta Meta
                           :output {s/Keyword (s/either Long String)}})
@@ -27,34 +27,63 @@
 
 (def crypt-opts {:password [:salted "foobar"]})
 
+(far/delete-table client-opts :spreadsheets)
+
+(far/ensure-table client-opts :customers
+                  [:customer :s]
+                  {:throughput {:read 1 :write 1}
+                   :block? true})
+
 (far/ensure-table client-opts :spreadsheets
-                  [:id :s]  ; Primary key named "id", (:n => number type)
+                  [:customer :s]  ; Primary key named "id", (:n => number type)
                   {:throughput {:read 1 :write 1} ; Read & write capacity (units/sec)
+                   :range-keydef [:spreadsheet :s]
                    :block? true ; Block thread during table creation
                    })
+
+(far/describe-table client-opts :spreadsheets)
 
 
 (far/list-tables client-opts)
 
 (far/put-item client-opts
+              :customers
+              {:customer "hans"
+               :name (far/freeze "Hans Wurst" crypt-opts)})
+
+(far/put-item client-opts
               :spreadsheets
-              {:id "hans/help"
+              {:customer "hans"
+               :spreadsheet "help"
                :name "example.xls"
                :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
                :type "local"
                :inputs (far/freeze #{"A1", "B1"} crypt-opts)
                :output (far/freeze #{"C1" "C2"} crypt-opts)})
 
-(far/get-item client-opts
+(far/put-item client-opts
               :spreadsheets
-              {:id "0"})
+              {:customer "hans"
+               :spreadsheet "nase"
+               :name "example.xls"
+               :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
+               :type "local"
+               :inputs (far/freeze #{"A1", "B1"} crypt-opts)
+               :output (far/freeze #{"D1" "D2"} crypt-opts)})
+
+(far/get-item client-opts :customers {:customer "hans"})
+
+(far/with-thaw-opts crypt-opts (far/get-item client-opts
+                                             :spreadsheets
+                                             {:customer "hans" :spreadsheet "help"}))
+
+(count (far/with-thaw-opts crypt-opts (far/query client-opts
+                                          :spreadsheets {:customer [:eq "hans"]})))
 
 (def formula-from-sheet
   (doc/cell-fn "C1"
                (first (doc/sheet-seq (doc/load-workbook "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx")))
                "A1"))
-
-(formula-from-sheet "Hund")
 
 (def inputs #{"A2" "A1"})
 (def outputs #{"C2" "C1"})
@@ -80,7 +109,8 @@
                   :summary "calculate the response value"
                   (ok (let
                         [meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
-                                            :spreadsheets {:id (str customer "/" spreadsheet)}))
+                                            :spreadsheets {:customer customer
+                                                           :spreadsheet spreadsheet}))
                          inputs   (:inputs meta)
                          outputs  (:output meta)
                          params   (:params request)
@@ -88,18 +118,24 @@
                          fnmap    (sheet-formulas inputs outputs sheet)
                          values   (vals (into (sorted-map) params))]
                         {:input (:params request)
-                       :meta (merge
-                              {:customer customer :spreadsheet spreadsheet }
-                              meta)
+                       :meta meta
                        :output (zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))})))
-            (POST* "/:customer/*" []
+            (POST* "/:customer/" []
                    :return Message
                    :path-params [customer :- String]
                    ;:form-params [inputs :- (s/either s/Str [s/Str]) outputs :- (s/either s/Str [s/Str]) name :- String]
                    ;:body-params [inputs :- [s/Str] outputs :- [s/Str] name :- String]
-                   :form-params [x :- (js/field [String] {:collectionFormat "multi"})]
+                   :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
+                                 outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell refernces such as A2"})
+                                 name :- String]
                    :summary "Create a new spreadsheet"
-                   (ok {:message (str "Hello?" x)})))
+                   (ok {:message (str "Hello?" inputs outputs)}))
+            (GET* "/:customer" []
+                  :return [s/Any]
+                  :path-params [customer :- String]
+                  :summary "List all spreadsheets for a customer"
+                  (ok (map #(:spreadsheet %) (far/with-thaw-opts crypt-opts (far/query client-opts
+                                                                :spreadsheets {:customer [:eq customer]}))))))
   (context* "/hello" []
     :tags ["hello"]
     (GET* "/" []

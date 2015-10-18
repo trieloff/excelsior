@@ -238,7 +238,7 @@
         <attribute name="followredirects" type="bool">0</attribute>
         <attribute name="body" type="string">[{"data":{"keyValues":[[["inputs"],["A1"],true],[["outputs"],["B1"],true],[["name"],["test"],true],[["inputs"],["A2"],true],[["outputs"],["B2"],true]]},"identifier":"com.luckymarmot.BodyFormKeyValueDynamicValue"}]</attribute>
         <attribute name="order" type="int64">5</attribute>
-        <attribute name="name" type="string">My API (5) Duplicate</attribute>
+        <attribute name="name" type="string">Create Spreadsheet</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z117"></relationship>
@@ -263,7 +263,7 @@
         <attribute name="method" type="string">GET</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
         <attribute name="order" type="int64">7</attribute>
-        <attribute name="name" type="string">My API (7)</attribute>
+        <attribute name="name" type="string">Get Spreadsheets</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z119"></relationship>

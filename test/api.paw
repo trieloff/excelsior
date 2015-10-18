@@ -5,7 +5,7 @@
     <databaseInfo>
         <version>134481920</version>
         <UUID>8FD65F05-C134-4100-8C51-5CC2D7FE3CCA</UUID>
-        <nextObjectID>122</nextObjectID>
+        <nextObjectID>126</nextObjectID>
         <metadata>
             <plist version="1.0">
                 <dict>
@@ -150,36 +150,11 @@
         <attribute name="redirectauthorization" type="bool">0</attribute>
         <attribute name="method" type="string">GET</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
-        <attribute name="order" type="int64">3</attribute>
+        <attribute name="order" type="int64">2</attribute>
         <attribute name="name" type="string">Get Formula with added stuff</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z114"></relationship>
-    </object>
-    <object type="LMKEYVALUE" id="z112">
-        <attribute name="value" type="string"></attribute>
-        <attribute name="order" type="int64">0</attribute>
-        <attribute name="name" type="string"></attribute>
-        <attribute name="enabled" type="bool">1</attribute>
-        <relationship name="groupforbodyparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
-        <relationship name="groupforheaders" type="0/1" destination="LMREQUESTGROUP"></relationship>
-        <relationship name="groupforurlparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
-        <relationship name="request" type="0/1" destination="LMREQUEST" idrefs="z113"></relationship>
-    </object>
-    <object type="LMREQUEST" id="z113">
-        <attribute name="uuid" type="string">0C0F1EE0-35B5-4F5B-AC12-C1896C0FB3AB</attribute>
-        <attribute name="url" type="string">http://localhost:3000/formula?input=Test</attribute>
-        <attribute name="storecookies" type="bool">1</attribute>
-        <attribute name="sendcookies" type="bool">1</attribute>
-        <attribute name="redirectmethod" type="bool">0</attribute>
-        <attribute name="redirectauthorization" type="bool">0</attribute>
-        <attribute name="method" type="string">GET</attribute>
-        <attribute name="followredirects" type="bool">0</attribute>
-        <attribute name="order" type="int64">2</attribute>
-        <attribute name="name" type="string">Get Formula</attribute>
-        <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
-        <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
-        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z112"></relationship>
     </object>
     <object type="LMKEYVALUE" id="z114">
         <attribute name="value" type="string"></attribute>
@@ -190,32 +165,6 @@
         <relationship name="groupforheaders" type="0/1" destination="LMREQUESTGROUP"></relationship>
         <relationship name="groupforurlparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
         <relationship name="request" type="0/1" destination="LMREQUEST" idrefs="z111"></relationship>
-    </object>
-    <object type="LMREQUEST" id="z115">
-        <attribute name="uuid" type="string">CECCD9A7-7336-4999-B77A-F08F18187F65</attribute>
-        <attribute name="url" type="string">http://localhost:3000/formula/hans/*</attribute>
-        <attribute name="storecookies" type="bool">1</attribute>
-        <attribute name="sendcookies" type="bool">1</attribute>
-        <attribute name="redirectmethod" type="bool">0</attribute>
-        <attribute name="redirectauthorization" type="bool">0</attribute>
-        <attribute name="method" type="string">POST</attribute>
-        <attribute name="followredirects" type="bool">0</attribute>
-        <attribute name="body" type="string">[{"data":{"keyValues":[[["x"],["A1"],true],[["outputs"],["B1,B2"],false],[["name"],["test"],false],[["inputs"],["A2"],false],[["x"],["B2"],false]]},"identifier":"com.luckymarmot.BodyFormKeyValueDynamicValue"}]</attribute>
-        <attribute name="order" type="int64">4</attribute>
-        <attribute name="name" type="string">My API (5)</attribute>
-        <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
-        <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
-        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z116"></relationship>
-    </object>
-    <object type="LMKEYVALUE" id="z116">
-        <attribute name="value" type="string"></attribute>
-        <attribute name="order" type="int64">0</attribute>
-        <attribute name="name" type="string"></attribute>
-        <attribute name="enabled" type="bool">1</attribute>
-        <relationship name="groupforbodyparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
-        <relationship name="groupforheaders" type="0/1" destination="LMREQUESTGROUP"></relationship>
-        <relationship name="groupforurlparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
-        <relationship name="request" type="0/1" destination="LMREQUEST" idrefs="z115"></relationship>
     </object>
     <object type="LMKEYVALUE" id="z117">
         <attribute name="value" type="string"></attribute>
@@ -237,7 +186,7 @@
         <attribute name="method" type="string">POST</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
         <attribute name="body" type="string">[{"data":{"keyValues":[[["inputs"],["A1"],true],[["outputs"],["B1"],true],[["name"],["test"],true],[["inputs"],["A2"],true],[["outputs"],["B2"],true]]},"identifier":"com.luckymarmot.BodyFormKeyValueDynamicValue"}]</attribute>
-        <attribute name="order" type="int64">5</attribute>
+        <attribute name="order" type="int64">3</attribute>
         <attribute name="name" type="string">Create Spreadsheet</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
@@ -262,13 +211,13 @@
         <attribute name="redirectauthorization" type="bool">0</attribute>
         <attribute name="method" type="string">GET</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
-        <attribute name="order" type="int64">7</attribute>
+        <attribute name="order" type="int64">6</attribute>
         <attribute name="name" type="string">Get Spreadsheets</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z119"></relationship>
     </object>
-    <object type="LMKEYVALUE" id="z121">
+    <object type="LMKEYVALUE" id="z123">
         <attribute name="value" type="string"></attribute>
         <attribute name="order" type="int64">0</attribute>
         <attribute name="name" type="string"></attribute>
@@ -276,21 +225,47 @@
         <relationship name="groupforbodyparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
         <relationship name="groupforheaders" type="0/1" destination="LMREQUESTGROUP"></relationship>
         <relationship name="groupforurlparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
-        <relationship name="request" type="0/1" destination="LMREQUEST" idrefs="z122"></relationship>
+        <relationship name="request" type="0/1" destination="LMREQUEST" idrefs="z124"></relationship>
     </object>
-    <object type="LMREQUEST" id="z122">
-        <attribute name="uuid" type="string">44D0137A-8B5D-4923-A1C4-78112561267B</attribute>
-        <attribute name="url" type="string">http://localhost:3000/swagger.json</attribute>
+    <object type="LMREQUEST" id="z124">
+        <attribute name="uuid" type="string">266A7111-C69A-402D-B7AD-85B7B897E715</attribute>
+        <attribute name="url" type="string">http://localhost:3000/formula/hans/nase</attribute>
+        <attribute name="storecookies" type="bool">1</attribute>
+        <attribute name="sendcookies" type="bool">1</attribute>
+        <attribute name="redirectmethod" type="bool">0</attribute>
+        <attribute name="redirectauthorization" type="bool">0</attribute>
+        <attribute name="method" type="string">POST</attribute>
+        <attribute name="followredirects" type="bool">0</attribute>
+        <attribute name="body" type="string">[{"data":{"keyValues":[[["inputs"],["A1"],true],[["outputs"],["C1"],true],[["inputs"],["B1"],true],[["outputs"],["C2"],true]]},"identifier":"com.luckymarmot.BodyFormKeyValueDynamicValue"}]</attribute>
+        <attribute name="order" type="int64">4</attribute>
+        <attribute name="name" type="string">Update Spreadsheet</attribute>
+        <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
+        <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
+        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z123"></relationship>
+    </object>
+    <object type="LMREQUEST" id="z125">
+        <attribute name="uuid" type="string">AAC4B0C8-61BA-4168-90DA-CD53C3DD81B9</attribute>
+        <attribute name="url" type="string">http://localhost:3000/formula/hans/help?A1=Flippi Pippi\u2600B1=19</attribute>
         <attribute name="storecookies" type="bool">1</attribute>
         <attribute name="sendcookies" type="bool">1</attribute>
         <attribute name="redirectmethod" type="bool">0</attribute>
         <attribute name="redirectauthorization" type="bool">0</attribute>
         <attribute name="method" type="string">GET</attribute>
         <attribute name="followredirects" type="bool">0</attribute>
-        <attribute name="order" type="int64">6</attribute>
-        <attribute name="name" type="string">Get Swagger</attribute>
+        <attribute name="order" type="int64">5</attribute>
+        <attribute name="name" type="string">Get Formula from Updated Spreadsheet</attribute>
         <relationship name="parent" type="0/1" destination="LMREQUESTTREEITEM"></relationship>
         <relationship name="children" type="0/0" destination="LMREQUESTTREEITEM"></relationship>
-        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z121"></relationship>
+        <relationship name="headers" type="0/0" destination="LMKEYVALUE" idrefs="z126"></relationship>
+    </object>
+    <object type="LMKEYVALUE" id="z126">
+        <attribute name="value" type="string"></attribute>
+        <attribute name="order" type="int64">0</attribute>
+        <attribute name="name" type="string"></attribute>
+        <attribute name="enabled" type="bool">1</attribute>
+        <relationship name="groupforbodyparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
+        <relationship name="groupforheaders" type="0/1" destination="LMREQUESTGROUP"></relationship>
+        <relationship name="groupforurlparameters" type="0/1" destination="LMREQUESTGROUP"></relationship>
+        <relationship name="request" type="0/1" destination="LMREQUEST" idrefs="z125"></relationship>
     </object>
 </database>

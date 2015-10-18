@@ -27,8 +27,6 @@
 
 (def crypt-opts {:password [:salted "foobar"]})
 
-(far/delete-table client-opts :spreadsheets)
-
 (far/ensure-table client-opts :customers
                   [:customer :s]
                   {:throughput {:read 1 :write 1}
@@ -159,6 +157,23 @@
                         {:input (:params request)
                        :meta meta
                        :output (zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))})))
+            (POST* "/:customer/:spreadsheet" []
+                   :return s/Any
+                   :path-params [customer :- String spreadsheet :- String]
+                   :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
+                                 outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})]
+                   :summary "Update input and output cells for a spreadsheet"
+                   (ok (let [meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
+                                            :spreadsheets {:customer customer
+                                                           :spreadsheet spreadsheet}))
+                             new-plain (assoc meta :inputs (set inputs) :output (set outputs))
+                             new-crypt (assoc meta
+                                         :inputs (far/freeze (set inputs) crypt-opts)
+                                         :output (far/freeze (set outputs) crypt-opts))
+                             put (far/put-item client-opts
+                                               :spreadsheets
+                                               new-crypt)]
+                         new-plain)))
             (POST* "/:customer/" []
                    :return s/Any
                    :path-params [customer :- String]

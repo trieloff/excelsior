@@ -71,14 +71,53 @@
                :inputs (far/freeze #{"A1", "B1"} crypt-opts)
                :output (far/freeze #{"D1" "D2"} crypt-opts)})
 
+(far/put-item client-opts
+              :spreadsheets
+              {:customer "hans"
+               :spreadsheet "nase-1"
+               :name "example.xls"
+               :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
+               :type "local"
+               :inputs (far/freeze #{"A1", "B1"} crypt-opts)
+               :output (far/freeze #{"D1" "D2"} crypt-opts)})
+
+(far/put-item client-opts
+              :spreadsheets
+              {:customer "hans"
+               :spreadsheet "nase-ring"
+               :name "example.xls"
+               :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
+               :type "local"
+               :inputs (far/freeze #{"A1", "B1"} crypt-opts)
+               :output (far/freeze #{"D1" "D2"} crypt-opts)})
+
 (far/get-item client-opts :customers {:customer "hans"})
 
-(far/with-thaw-opts crypt-opts (far/get-item client-opts
-                                             :spreadsheets
-                                             {:customer "hans" :spreadsheet "help"}))
 
 (count (far/with-thaw-opts crypt-opts (far/query client-opts
-                                          :spreadsheets {:customer [:eq "hans"]})))
+                                          :spreadsheets {:customer [:eq "hans"]
+                                                         :spreadsheet [:begins-with "nase"]})))
+
+(defn is-unique-name? [customer name]
+  (nil? (far/with-thaw-opts crypt-opts (far/get-item client-opts
+                                             :spreadsheets
+                                             {:customer customer :spreadsheet name}))))
+
+(defn count-variants [customer name]
+  (inc (count (filter #(re-matches (re-pattern (str "^" name "-\\d+")) (:spreadsheet %)) (far/with-thaw-opts crypt-opts (far/query client-opts
+                                          :spreadsheets {:customer [:eq customer]
+                                                         :spreadsheet [:begins-with (str name "-")]}))))))
+
+(defn make-unique-name [customer name]
+  (if (is-unique-name? customer name)
+    name
+    (str name "-" (count-variants customer name))))
+
+(is-unique-name? "hans" "wurst")
+(is-unique-name? "hans" "nase")
+(count-variants "hans" "nase")
+(make-unique-name "hans" "wurst")
+(make-unique-name "hans" "nase")
 
 (def formula-from-sheet
   (doc/cell-fn "C1"
@@ -121,7 +160,7 @@
                        :meta meta
                        :output (zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))})))
             (POST* "/:customer/" []
-                   :return Message
+                   :return s/Any
                    :path-params [customer :- String]
                    ;:form-params [inputs :- (s/either s/Str [s/Str]) outputs :- (s/either s/Str [s/Str]) name :- String]
                    ;:body-params [inputs :- [s/Str] outputs :- [s/Str] name :- String]
@@ -129,7 +168,13 @@
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})
                                  name :- String]
                    :summary "Create a new spreadsheet"
-                   (ok {:message (str "Hello?" inputs outputs)}))
+                   (ok (let [meta {:customer     customer
+                                   :spreadsheet  name
+                                   :url          ""
+                                   :type         "local"
+                                   :inputs       (far/freeze (set inputs) crypt-opts)
+                                   :output       (far/freeze (set outputs) crypt-opts)}]
+                         meta)))
             (GET* "/:customer" []
                   :return [s/Any]
                   :path-params [customer :- String]

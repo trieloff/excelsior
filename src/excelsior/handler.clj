@@ -162,8 +162,6 @@
             (POST* "/:customer/" []
                    :return s/Any
                    :path-params [customer :- String]
-                   ;:form-params [inputs :- (s/either s/Str [s/Str]) outputs :- (s/either s/Str [s/Str]) name :- String]
-                   ;:body-params [inputs :- [s/Str] outputs :- [s/Str] name :- String]
                    :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})
                                  name :- String]

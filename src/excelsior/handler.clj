@@ -169,12 +169,15 @@
                                  name :- String]
                    :summary "Create a new spreadsheet"
                    (ok (let [meta {:customer     customer
-                                   :spreadsheet  name
-                                   :url          ""
+                                   :spreadsheet  (make-unique-name customer name)
+                                   :url          "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
                                    :type         "local"
                                    :inputs       (far/freeze (set inputs) crypt-opts)
-                                   :output       (far/freeze (set outputs) crypt-opts)}]
-                         meta)))
+                                   :output       (far/freeze (set outputs) crypt-opts)}
+                             put (far/put-item client-opts
+                                               :spreadsheets
+                                               meta)]
+                         (assoc meta :inputs (set inputs) :output (set outputs)))))
             (GET* "/:customer" []
                   :return [s/Any]
                   :path-params [customer :- String]

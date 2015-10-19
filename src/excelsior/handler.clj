@@ -5,6 +5,7 @@
             [clojure.string :as str]
             [dk.ative.docjure.spreadsheet :as doc]
             [ring.swagger.json-schema :as js]
+            [ring.swagger.upload :as upload]
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
@@ -174,6 +175,12 @@
                                                :spreadsheets
                                                new-crypt)]
                          new-plain)))
+            (POST* "/:customer/:spreadsheet/upload" []
+                   :return s/Any
+                   :path-params [customer :- String spreadsheet :- String]
+                   :multipart-params [file :- upload/TempFileUpload]
+                   :middlewares [upload/wrap-multipart-params]
+                   (ok (dissoc file :tempfile)))
             (POST* "/:customer/" []
                    :return s/Any
                    :path-params [customer :- String]
@@ -183,7 +190,6 @@
                    :summary "Create a new spreadsheet"
                    (ok (let [meta {:customer     customer
                                    :spreadsheet  (make-unique-name customer name)
-                                   :url          "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
                                    :type         "local"
                                    :inputs       (far/freeze (set inputs) crypt-opts)
                                    :output       (far/freeze (set outputs) crypt-opts)}

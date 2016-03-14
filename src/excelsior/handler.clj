@@ -8,10 +8,18 @@
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
-(s/defschema Meta {:customer String :spreadsheet String :name String :url String :type String :output #{String} :inputs #{String}})
+
+(s/defschema Meta {:customer String
+                   :spreadsheet String
+                   :name String
+                   :url String
+                   :type String
+                   :output #{String}
+                   :inputs #{String}})
+
 (s/defschema Spreadsheet {:input {s/Keyword (s/either Long String)}
                           :meta Meta
-                          :output {s/Keyword (s/either Long String)}})
+                          :output {s/Keyword (s/either Number String)}})
 
 (def client-opts
   {;;; For DDB Local just use some random strings here, otherwise include your
@@ -132,13 +140,13 @@
                           (apply doc/cell-fn % (first (doc/sheet-seq (doc/load-workbook sheet))) (sort inputs))) (sort outputs))))
 
 (defapi app
-  {:swagger
+  {:ring-swagger {:ignore-missing-mappings? true}
+   :swagger
    {:ui "/"
     :spec "/swagger.json"
     :data {:info {:title "Excelsior"
             :description "A REST API for Spreadsheets"}}}}
   (context "/formula" []
-            :tags ["formula"]
             (GET "/:customer/:spreadsheet" request
                   :return Spreadsheet
                   :path-params [customer :- String spreadsheet :- String]
@@ -156,8 +164,9 @@
                         {:input (:params request)
                        :meta meta
                        :output (zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))})))
-            (POST "/:customer/:spreadsheet" []
-                   :return s/Any
+
+           (POST "/:customer/:spreadsheet" []
+                   :return Meta
                    :path-params [customer :- String spreadsheet :- String]
                    :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})]
@@ -173,8 +182,9 @@
                                                :spreadsheets
                                                new-crypt)]
                          new-plain)))
-            (POST "/:customer/" []
-                   :return s/Any
+
+           (POST "/:customer/" []
+                   :return Meta
                    :path-params [customer :- String]
                    :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})
@@ -182,6 +192,7 @@
                    :summary "Create a new spreadsheet"
                    (ok (let [meta {:customer     customer
                                    :spreadsheet  (make-unique-name customer name)
+                                   :name         name
                                    :url          "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
                                    :type         "local"
                                    :inputs       (far/freeze (set inputs) crypt-opts)
@@ -191,7 +202,7 @@
                                                meta)]
                          (assoc meta :inputs (set inputs) :output (set outputs)))))
             (GET "/:customer" []
-                  :return [s/Any]
+                  :return [String]
                   :path-params [customer :- String]
                   :summary "List all spreadsheets for a customer"
                   (ok (map #(:spreadsheet %) (far/with-thaw-opts crypt-opts (far/query client-opts

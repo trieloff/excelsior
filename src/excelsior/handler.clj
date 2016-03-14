@@ -132,15 +132,14 @@
                           (apply doc/cell-fn % (first (doc/sheet-seq (doc/load-workbook sheet))) (sort inputs))) (sort outputs))))
 
 (defapi app
-  (swagger-ui)
-  (swagger-docs
-    {:info {:title "Excelsior"
-            :description "A REST API for Spreadsheets"}
-     :tags [{:name "hello", :description "says hello in Finnish"}
-            {:name "formula" :description "evaluates Excel spreadsheet formulas"}]})
-  (context* "/formula" []
+  {:swagger
+   {:ui "/"
+    :spec "/swagger.json"
+    :data {:info {:title "Excelsior"
+            :description "A REST API for Spreadsheets"}}}}
+  (context "/formula" []
             :tags ["formula"]
-            (GET* "/:customer/:spreadsheet" request
+            (GET "/:customer/:spreadsheet" request
                   :return Spreadsheet
                   :path-params [customer :- String spreadsheet :- String]
                   :summary "calculate the response value"
@@ -157,7 +156,7 @@
                         {:input (:params request)
                        :meta meta
                        :output (zipmap (keys fnmap) (map #(apply % values) (vals fnmap)))})))
-            (POST* "/:customer/:spreadsheet" []
+            (POST "/:customer/:spreadsheet" []
                    :return s/Any
                    :path-params [customer :- String spreadsheet :- String]
                    :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
@@ -174,7 +173,7 @@
                                                :spreadsheets
                                                new-crypt)]
                          new-plain)))
-            (POST* "/:customer/" []
+            (POST "/:customer/" []
                    :return s/Any
                    :path-params [customer :- String]
                    :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
@@ -191,15 +190,15 @@
                                                :spreadsheets
                                                meta)]
                          (assoc meta :inputs (set inputs) :output (set outputs)))))
-            (GET* "/:customer" []
+            (GET "/:customer" []
                   :return [s/Any]
                   :path-params [customer :- String]
                   :summary "List all spreadsheets for a customer"
                   (ok (map #(:spreadsheet %) (far/with-thaw-opts crypt-opts (far/query client-opts
                                                                 :spreadsheets {:customer [:eq customer]}))))))
-  (context* "/hello" []
+  (context "/hello" []
     :tags ["hello"]
-    (GET* "/" []
+    (GET "/" []
       :return Message
       :query-params [name :- String]
       :summary "say hello"

@@ -1,5 +1,6 @@
 (ns excelsior.handler
   (:require [compojure.api.sweet :refer :all]
+            [ring-aws-lambda-adapter.core :refer [defhandler]]
             [ring.util.http-response :refer :all]
             [taoensso.faraday :as far]
             [clojure.string :as str]
@@ -215,3 +216,5 @@
       :query-params [name :- String]
       :summary "say hello"
       (ok {:message (str "Terve, " name)}))))
+
+(defhandler excelsior.handler.Lambda app)

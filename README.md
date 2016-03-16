@@ -74,10 +74,10 @@ All configuration is performed through environment variables. Excelsior uses the
 Add (and replace appropriately) in your local `profiles.clj`:
 
 ````
-        :env {:aws_access_key "random"
-              :aws_secret_key "random"
-              :dynamodb_endpoint "http://localhost:8000"
-              :dynamodb_crypt_key "secret"}
+        :env {:aws-access-key "random"
+              :aws-secret-key "random"
+              :dynamodb-endpoint "http://localhost:8000"
+              :dynamodb-crypt-key "secret"}
 ````
 
 Run `lein ring server` for a local instance running on port 3000. You need to have the configuration set as above, and (optionally) have `dynamodb-local` running in parallel.

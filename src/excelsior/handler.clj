@@ -25,16 +25,16 @@
 (def client-opts
   {;;; For DDB Local just use some random strings here, otherwise include your
    ;;; production IAM keys:
-   :access-key (env :aws_access_key) ;; reading from $AWS_ACCESS_KEY environment variable
-   :secret-key (env :aws_secret_key) ;; reading from $AWS_SECRET_KEY environment variable
+   :access-key (env/env :aws_access_key) ;; reading from $AWS_ACCESS_KEY environment variable
+   :secret-key (env/env :aws_secret_key) ;; reading from $AWS_SECRET_KEY environment variable
 
    ;;; You may optionally override the default endpoint if you'd like to use DDB
    ;;; Local or a different AWS Region (Ref. http://goo.gl/YmV80o), etc.:
-   :endpoint (env :dynamodb_endpoint)                   ; For DDB Local
+   :endpoint (env/env :dynamodb_endpoint)                   ; For DDB Local
    ;; :endpoint "http://dynamodb.eu-west-1.amazonaws.com" ; For EU West 1 AWS region
    })
 
-(def crypt-opts {:password [:salted (env :dynamodb_crypt_key)]})
+(def crypt-opts {:password [:salted (env/env :dynamodb_crypt_key)]})
 
 (far/ensure-table client-opts :customers
                   [:customer :s]

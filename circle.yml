@@ -1,0 +1,9 @@
+deploy:
+  production:
+    branch: master
+    commands:
+    - lein deploy private
+  staging:
+    branch: private-deploy
+    commands:
+    - lein deploy private

@@ -1,6 +1,6 @@
 machine:
   environment:
-    dynamodb_endpoint: https://dynamodb.us-east-1.amazonaws.com
+    DYNAMODB_ENDPOINT: https://dynamodb.us-east-1.amazonaws.com
 deployment:
   production:
     branch: master

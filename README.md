@@ -79,3 +79,5 @@ Add (and replace appropriately) in your local `profiles.clj`:
               :dynamodb_endpoint "http://localhost:8000"
               :dynamodb_crypt_key "secret"}
 ````
+
+Run `lein ring server` for a local instance running on port 3000. You need to have the configuration set as above, and (optionally) have `dynamodb-local` running in parallel.

@@ -59,3 +59,23 @@ And from the sky, serene and far,
 A voice fell like a falling star,
       Excelsior!
 ````
+
+## Configuration
+
+All configuration is performed through environment variables. Excelsior uses the [environ](https://github.com/weavejester/environ) library, so you can easily set up local development using [DynamoDB Local](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.DynamoDBLocal.html) by adding the right environment variables to your `profiles.clj`.
+
+* `AWS_ACCESS_KEY` – your AWS access key, required to access DynamoDB and S3
+* `AWS_SECRET_KEY` – your AWS secret key, required to access DynamoDB and S3
+* `DYNAMODB_ENDPOINT` – URL of the DynamoDB instance to use. For instance "https://dynamodb.eu-west-1.amazonaws.com" for the EU West [region](http://docs.aws.amazon.com/general/latest/gr/rande.html#ddb_region) or "http://localhost:8000" for a local development instance.The protocol must be included.
+* `DYNAMODB_CRYPT_KEY – encryption password for encrypted data storage in DynamoDB
+
+### Local Development
+
+Add (and replace appropriately) in your local `profiles.clj`:
+
+````
+        :env {:aws_access_key "random"
+              :aws_secret_key "random"
+              :dynamodb_endpoint "http://localhost:8000"
+              :dynamodb_crypt_key "secret"}
+````

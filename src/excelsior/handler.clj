@@ -5,6 +5,7 @@
             [clojure.string :as str]
             [dk.ative.docjure.spreadsheet :as doc]
             [ring.swagger.json-schema :as js]
+            [environ.core :as env]
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
@@ -24,16 +25,16 @@
 (def client-opts
   {;;; For DDB Local just use some random strings here, otherwise include your
    ;;; production IAM keys:
-   :access-key "<AWS_DYNAMODB_ACCESS_KEY>"
-   :secret-key "<AWS_DYNAMODB_SECRET_KEY>"
+   :access-key (env :aws_access_key) ;; reading from $AWS_ACCESS_KEY environment variable
+   :secret-key (env :aws_secret_key) ;; reading from $AWS_SECRET_KEY environment variable
 
    ;;; You may optionally override the default endpoint if you'd like to use DDB
    ;;; Local or a different AWS Region (Ref. http://goo.gl/YmV80o), etc.:
-   :endpoint "http://localhost:8000"                   ; For DDB Local
+   :endpoint (env :dynamodb_endpoint)                   ; For DDB Local
    ;; :endpoint "http://dynamodb.eu-west-1.amazonaws.com" ; For EU West 1 AWS region
    })
 
-(def crypt-opts {:password [:salted "foobar"]})
+(def crypt-opts {:password [:salted (env :dynamodb_crypt_key)]})
 
 (far/ensure-table client-opts :customers
                   [:customer :s]

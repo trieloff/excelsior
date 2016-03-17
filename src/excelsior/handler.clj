@@ -217,4 +217,4 @@
       :summary "say hello"
       (ok {:message (str "Terve, " name)}))))
 
-(defhandler excelsior.handler.Lambda app)
+(defhandler excelsior.handler.Lambda app {})

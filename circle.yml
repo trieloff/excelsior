@@ -11,4 +11,7 @@ deployment:
     commands:
     - lein uberjar
     - lein deploy private excelsior 0.1.0-SNAPSHOT target/server.jar
+    - echo "[default]" > ~/.aws/credentials
+    - echo "aws_access_key = " $AWS_ACCESS_KEY >> ~/.aws/credentials
+    - echo "aws_secret_key = " $AWS_SECRET_KEY >> ~/.aws/credentials
     - aws lambda update-function-code --region us-east-1 --function-name excelsior-dev --s3-bucket leinrepo --s3-key /releases/excelsior/excelsior/0.1.0-SNAPSHOT/excelsior-`xmllint ~/.m2/repository/excelsior/excelsior/0.1.0-SNAPSHOT/maven-metadata-private.xml --xpath "/metadata/versioning/snapshotVersions/snapshotVersion[1]/value/text()"`.jar

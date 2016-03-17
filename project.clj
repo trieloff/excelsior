@@ -14,6 +14,7 @@
   :plugins [[test2junit "1.1.2"]
             [lein-environ "1.0.2"]
             [lein-maven-s3-wagon "0.2.5"]]
+  :test2junit-output-dir ~(or (System/getenv "CIRCLE_TEST_REPORTS") "target/test2junit")
   :env {:aws-access-key #=(eval (System/getenv "AWS_ACCESS_KEY"))
         :aws-secret-key #=(eval (System/getenv "AWS_SECRET_KEY"))
         :dynamodb-crypt-key #=(eval (System/getenv "DYNAMODB_CRYPT_KEY"))

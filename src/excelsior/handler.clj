@@ -35,6 +35,9 @@
    ;; :endpoint "http://dynamodb.eu-west-1.amazonaws.com" ; For EU West 1 AWS region
    })
 
+(print "Starting server")
+(print client-opts)
+
 (def crypt-opts {:password [:salted (env/env :dynamodb-crypt-key "secret")]})
 
 (far/ensure-table client-opts :customers

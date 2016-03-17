@@ -9,9 +9,14 @@
                  [dk.ative/docjure "1.11.0-SNAPSHOT"]]
   :ring {:handler excelsior.handler/app}
   :uberjar-name "server.jar"
+  :resource-paths ["resources"
+                   ".lein-env"] ; let's see if we can sneak the environment variables into the binary
   :plugins [[test2junit "1.1.2"]
             [lein-environ "1.0.2"]
             [lein-maven-s3-wagon "0.2.5"]]
+  :env {:aws-access-key #=(eval (System/getenv "AWS_ACCESS_KEY"))
+        :aws-secret-key #=(eval (System/getenv "AWS_SECRET_KEY"))
+        :dynamodb-endpoint #=(eval (System/getenv "DYNAMODB_ENDPOINT"))}
   :deploy-repositories {"private" {:url "s3://leinrepo/releases/"
                                    :username :env/aws_access_key ;; gets environment variable AWS_ACCESS_KEY
                                    :password :env/aws_secret_key}}
@@ -20,4 +25,4 @@
                             :password :env/aws_secret_key}}
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]
                    :plugins [[lein-ring "0.9.7"]]}
-             :uberjar {:main excelsior.handler :aot :all}})
+             :uberjar {:main excelsior.core :aot :all}})

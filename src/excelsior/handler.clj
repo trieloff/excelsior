@@ -35,27 +35,30 @@
    ;; :endpoint "http://dynamodb.eu-west-1.amazonaws.com" ; For EU West 1 AWS region
    })
 
-(println "Starting server")
-(println client-opts)
-
 (def crypt-opts {:password [:salted (env/env :dynamodb-crypt-key)]})
 
+(defn -init []
+  (println "Database Initialization")
 
-(println "Checking customers table")
+  (println "Access key: " (env/env :aws-access-key))
 
-(far/ensure-table client-opts :customers
-                  [:customer :s]
-                  {:throughput {:read 1 :write 1}
-                   :block? true})
+  (println "Checking customers table")
 
-(println "Checking spreadsheets table")
+  (far/ensure-table client-opts :customers
+                    [:customer :s]
+                    {:throughput {:read 1 :write 1}
+                     :block? true})
 
-(far/ensure-table client-opts :spreadsheets
-                  [:customer :s]  ; Primary key named "id", (:n => number type)
-                  {:throughput {:read 1 :write 1} ; Read & write capacity (units/sec)
-                   :range-keydef [:spreadsheet :s]
-                   :block? true ; Block thread during table creation
-                   })
+  (println "Checking spreadsheets table")
+
+  (far/ensure-table client-opts :spreadsheets
+                    [:customer :s]  ; Primary key named "id", (:n => number type)
+                    {:throughput {:read 1 :write 1} ; Read & write capacity (units/sec)
+                     :range-keydef [:spreadsheet :s]
+                     :block? true ; Block thread during table creation
+                     }))
+
+(def init (memoize -init))
 
 (defn is-unique-name? [customer name]
   (nil? (far/with-thaw-opts crypt-opts (far/get-item client-opts
@@ -91,7 +94,8 @@
                   :path-params [customer :- String spreadsheet :- String]
                   :summary "calculate the response value"
                   (ok (let
-                        [meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
+                        [db (init)
+                         meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
                                             :spreadsheets {:customer customer
                                                            :spreadsheet spreadsheet}))
                          inputs   (:inputs meta)
@@ -110,7 +114,8 @@
                    :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})]
                    :summary "Update input and output cells for a spreadsheet"
-                   (ok (let [meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
+                   (ok (let [db (init)
+                             meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
                                             :spreadsheets {:customer customer
                                                            :spreadsheet spreadsheet}))
                              new-plain (assoc meta :inputs (set inputs) :output (set outputs))
@@ -129,7 +134,8 @@
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})
                                  name :- String]
                    :summary "Create a new spreadsheet"
-                   (ok (let [meta {:customer     customer
+                   (ok (let [db (init)
+                             meta {:customer     customer
                                    :spreadsheet  (make-unique-name customer name)
                                    :name         name
                                    :url          "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"

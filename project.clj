@@ -3,7 +3,7 @@
   :url "https://github.com/trieloff/excelsior"
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [metosin/compojure-api "1.0.1"]
-                 [com.taoensso/faraday "1.8.0"]
+                 [com.taoensso/faraday "1.9.0-beta1"]
                  [environ "1.0.2"]
                  [ring-aws-lambda-adapter "0.1.1"]
                  [dk.ative/docjure "1.11.0-SNAPSHOT"]]

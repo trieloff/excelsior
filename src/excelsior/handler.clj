@@ -35,15 +35,20 @@
    ;; :endpoint "http://dynamodb.eu-west-1.amazonaws.com" ; For EU West 1 AWS region
    })
 
-(print "Starting server")
-(print client-opts)
+(println "Starting server")
+(println client-opts)
 
 (def crypt-opts {:password [:salted (env/env :dynamodb-crypt-key)]})
+
+
+(println "Checking customers table")
 
 (far/ensure-table client-opts :customers
                   [:customer :s]
                   {:throughput {:read 1 :write 1}
                    :block? true})
+
+(println "Checking spreadsheets table")
 
 (far/ensure-table client-opts :spreadsheets
                   [:customer :s]  ; Primary key named "id", (:n => number type)

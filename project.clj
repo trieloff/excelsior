@@ -5,7 +5,6 @@
                  [metosin/compojure-api "1.0.1"]
                  [com.taoensso/faraday "1.8.0"]
                  [environ "1.0.2"]
-                 [ring-aws-lambda-adapter "0.1.1"]
                  [dk.ative/docjure "1.11.0-SNAPSHOT"]]
   :ring {:handler excelsior.handler/app}
   :uberjar-name "server.jar"
@@ -19,5 +18,4 @@
                                    :username :env/aws_access_key ;; gets environment variable AWS_ACCESS_KEY
                                    :password :env/aws_secret_key}}
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]
-                   :plugins [[lein-ring "0.9.7"]]}
-             :uberjar {:main excelsior.handler :aot :all}})
+                   :plugins [[lein-ring "0.9.7"]]}})

@@ -7,6 +7,6 @@ deployment:
     commands:
     - lein deploy private
   staging:
-    branch: private-deploy
     commands:
-    - lein deploy private
+    - lein uberjar
+    - lein deploy private excelsior 0.1.0-SNAPSHOT target/server.jar

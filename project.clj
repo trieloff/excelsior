@@ -11,13 +11,13 @@
   :uberjar-name "server.jar"
   :plugins [[test2junit "1.1.2"]
             [lein-environ "1.0.2"]
-            [lein-maven-s3-wagon "0.2.4"]]
+            [lein-maven-s3-wagon "0.2.5"]]
   :deploy-repositories {"private" {:url "s3://leinrepo/releases/"
                                    :username :env/aws_access_key ;; gets environment variable AWS_ACCESS_KEY
                                    :password :env/aws_secret_key}}
   :repositories {"private" {:url "s3://leinrepo/releases/"
-                                   :username :env/aws_access_key ;; gets environment variable AWS_ACCESS_KEY
-                                   :password :env/aws_secret_key}}
+                            :username :env/aws_access_key ;; gets environment variable AWS_ACCESS_KEY
+                            :password :env/aws_secret_key}}
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]
                    :plugins [[lein-ring "0.9.7"]]}
              :uberjar {:main excelsior.handler :aot :all}})

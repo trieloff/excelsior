@@ -158,6 +158,11 @@
       :return Message
       :query-params [name :- String]
       :summary "say hello"
-      (ok {:message (str "Terve, " name)}))))
+      (ok {:message (str "Terve, " name)}))
+    (POST "/" []
+      :return Message
+      :body-params [name :- String]
+      :summary "say hello"
+      (ok {:message (str "Hallo, " name)}))))
 
 (defhandler excelsior.handler.Lambda app {})

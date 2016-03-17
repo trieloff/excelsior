@@ -6,7 +6,7 @@
             [clojure.string :as str]
             [dk.ative.docjure.spreadsheet :as doc]
             [ring.swagger.json-schema :as js]
-            [environ.core :as env]
+            [excelsior.core :as env]
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
@@ -38,7 +38,7 @@
 (print "Starting server")
 (print client-opts)
 
-(def crypt-opts {:password [:salted (env/env :dynamodb-crypt-key "secret")]})
+(def crypt-opts {:password [:salted (env/env :dynamodb-crypt-key)]})
 
 (far/ensure-table client-opts :customers
                   [:customer :s]

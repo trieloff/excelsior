@@ -16,6 +16,7 @@
             [lein-maven-s3-wagon "0.2.5"]]
   :env {:aws-access-key #=(eval (System/getenv "AWS_ACCESS_KEY"))
         :aws-secret-key #=(eval (System/getenv "AWS_SECRET_KEY"))
+        :dynamodb-crypt-key #=(eval (System/getenv "DYNAMODB_CRYPT_KEY"))
         :dynamodb-endpoint #=(eval (System/getenv "DYNAMODB_ENDPOINT"))}
   :deploy-repositories {"private" {:url "s3://leinrepo/releases/"
                                    :username :env/aws_access_key ;; gets environment variable AWS_ACCESS_KEY

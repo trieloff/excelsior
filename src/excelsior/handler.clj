@@ -158,7 +158,7 @@
       :return Message
       :query-params [name :- String]
       :summary "say hello"
-      (ok {:message (str "Terve, " name)}))
+      (ok {:message (str "Tere, " name)}))
     (POST "/" []
       :return Message
       :body-params [name :- String]

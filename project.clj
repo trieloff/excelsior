@@ -5,6 +5,7 @@
                  [metosin/compojure-api "1.0.1"]
                  [com.taoensso/faraday "1.9.0-beta1"]
                  [environ "1.0.2"]
+                 [amazonica "0.3.52"]
                  [ring-aws-lambda-adapter "0.1.1"]
                  [dk.ative/docjure "1.11.0-SNAPSHOT"]]
   :ring {:handler excelsior.handler/app}

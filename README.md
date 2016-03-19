@@ -62,7 +62,8 @@ A voice fell like a falling star,
 
 ## Configuration
 
-All configuration is performed through environment variables. Excelsior uses the [environ](https://github.com/weavejester/environ) library, so you can easily set up local development using [DynamoDB Local](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.DynamoDBLocal.html) by adding the right environment variables to your `profiles.clj`.
+All configuration is performed through environment variables. Excelsior uses the [environ](https://github.com/weavejester/environ) library, so you can easily set up local development using [DynamoDB Local](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.DynamoDBLocal.html) by setting the right environment variables. The variables at build time will be "baked in" to the binary, so that
+the binary can be deployed in environments like AWS Lambda that do not support setting environment variables.
 
 * `AWS_ACCESS_KEY` – your AWS access key, required to access DynamoDB and S3
 * `AWS_SECRET_KEY` – your AWS secret key, required to access DynamoDB and S3

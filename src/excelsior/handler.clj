@@ -1,11 +1,12 @@
 (ns excelsior.handler
   (:require [compojure.api.sweet :refer :all]
+            [ring-aws-lambda-adapter.core :refer [defhandler]]
             [ring.util.http-response :refer :all]
             [taoensso.faraday :as far]
             [clojure.string :as str]
             [dk.ative.docjure.spreadsheet :as doc]
             [ring.swagger.json-schema :as js]
-            [environ.core :as env]
+            [excelsior.core :as env]
             [schema.core :as s]))
 
 (s/defschema Message {:message String})
@@ -36,74 +37,28 @@
 
 (def crypt-opts {:password [:salted (env/env :dynamodb-crypt-key)]})
 
+(defn -init []
+  (println "Database Initialization")
+
+  (println "Access key: " (env/env :aws-access-key))
+
+  (println "Checking customers table")
+
 (far/ensure-table client-opts :customers
                   [:customer :s]
                   {:throughput {:read 1 :write 1}
                    :block? true})
+
+  (println "Checking spreadsheets table")
 
 (far/ensure-table client-opts :spreadsheets
                   [:customer :s]  ; Primary key named "id", (:n => number type)
                   {:throughput {:read 1 :write 1} ; Read & write capacity (units/sec)
                    :range-keydef [:spreadsheet :s]
                    :block? true ; Block thread during table creation
-                   })
+                     }))
 
-(far/describe-table client-opts :spreadsheets)
-
-
-(far/list-tables client-opts)
-
-(far/put-item client-opts
-              :customers
-              {:customer "hans"
-               :name (far/freeze "Hans Wurst" crypt-opts)})
-
-(far/put-item client-opts
-              :spreadsheets
-              {:customer "hans"
-               :spreadsheet "help"
-               :name "example.xls"
-               :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
-               :type "local"
-               :inputs (far/freeze #{"A1", "B1"} crypt-opts)
-               :output (far/freeze #{"C1" "C2"} crypt-opts)})
-
-(far/put-item client-opts
-              :spreadsheets
-              {:customer "hans"
-               :spreadsheet "nase"
-               :name "example.xls"
-               :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
-               :type "local"
-               :inputs (far/freeze #{"A1", "B1"} crypt-opts)
-               :output (far/freeze #{"D1" "D2"} crypt-opts)})
-
-(far/put-item client-opts
-              :spreadsheets
-              {:customer "hans"
-               :spreadsheet "nase-1"
-               :name "example.xls"
-               :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
-               :type "local"
-               :inputs (far/freeze #{"A1", "B1"} crypt-opts)
-               :output (far/freeze #{"D1" "D2"} crypt-opts)})
-
-(far/put-item client-opts
-              :spreadsheets
-              {:customer "hans"
-               :spreadsheet "nase-ring"
-               :name "example.xls"
-               :url "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
-               :type "local"
-               :inputs (far/freeze #{"A1", "B1"} crypt-opts)
-               :output (far/freeze #{"D1" "D2"} crypt-opts)})
-
-(far/get-item client-opts :customers {:customer "hans"})
-
-
-(count (far/with-thaw-opts crypt-opts (far/query client-opts
-                                          :spreadsheets {:customer [:eq "hans"]
-                                                         :spreadsheet [:begins-with "nase"]})))
+(def init (memoize -init))
 
 (defn is-unique-name? [customer name]
   (nil? (far/with-thaw-opts crypt-opts (far/get-item client-opts
@@ -120,20 +75,6 @@
     name
     (str name "-" (count-variants customer name))))
 
-(is-unique-name? "hans" "wurst")
-(is-unique-name? "hans" "nase")
-(count-variants "hans" "nase")
-(make-unique-name "hans" "wurst")
-(make-unique-name "hans" "nase")
-
-(def formula-from-sheet
-  (doc/cell-fn "C1"
-               (first (doc/sheet-seq (doc/load-workbook "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx")))
-               "A1"))
-
-(def inputs #{"A2" "A1"})
-(def outputs #{"C2" "C1"})
-(def params {:A2 12 :A1 "Katze"})
 
 (defn sheet-formulas [inputs outputs sheet]
   (into (hash-map) (map #(conj
@@ -153,7 +94,8 @@
                   :path-params [customer :- String spreadsheet :- String]
                   :summary "calculate the response value"
                   (ok (let
-                        [meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
+                        [db (init)
+                         meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
                                             :spreadsheets {:customer customer
                                                            :spreadsheet spreadsheet}))
                          inputs   (:inputs meta)
@@ -169,10 +111,11 @@
            (POST "/:customer/:spreadsheet" []
                    :return Meta
                    :path-params [customer :- String spreadsheet :- String]
-                   :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
+                   :body-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})]
                    :summary "Update input and output cells for a spreadsheet"
-                   (ok (let [meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
+                   (ok (let [db (init)
+                             meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
                                             :spreadsheets {:customer customer
                                                            :spreadsheet spreadsheet}))
                              new-plain (assoc meta :inputs (set inputs) :output (set outputs))
@@ -187,11 +130,12 @@
            (POST "/:customer/" []
                    :return Meta
                    :path-params [customer :- String]
-                   :form-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
+                   :body-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})
                                  name :- String]
                    :summary "Create a new spreadsheet"
-                   (ok (let [meta {:customer     customer
+                   (ok (let [db (init)
+                             meta {:customer     customer
                                    :spreadsheet  (make-unique-name customer name)
                                    :name         name
                                    :url          "/Users/ltrieloff/Documents/excelsior/resources/helloworld.xlsx"
@@ -214,4 +158,11 @@
       :return Message
       :query-params [name :- String]
       :summary "say hello"
-      (ok {:message (str "Terve, " name)}))))
+      (ok {:message (str "Tere, " name)}))
+    (POST "/" []
+      :return Message
+      :body-params [name :- String]
+      :summary "say hello"
+      (ok {:message (str "Hallo, " name)}))))
+
+(defhandler excelsior.handler.Lambda app {})

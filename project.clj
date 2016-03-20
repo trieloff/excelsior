@@ -26,5 +26,5 @@
                             :username :env/aws_access_key ;; gets environment variable AWS_ACCESS_KEY
                             :password :env/aws_secret_key}}
   :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]]
-                   :plugins [[lein-ring "0.9.7"]]}})
+                   :plugins [[lein-ring "0.9.7"]]}
              :uberjar {:main excelsior.core :aot :all}})

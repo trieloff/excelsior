@@ -75,3 +75,8 @@
 (def inputs #{"A2" "A1"})
 (def outputs #{"C2" "C1"})
 (def params {:A2 12 :A1 "Katze"})
+
+(deftest swagger
+  (is (not (nil? app)))
+  (is (not (nil? (app {:request-method :get, :uri "/swagger.json"}))))
+  (spit "target/swagger.json" (slurp (:body (app {:request-method :get, :uri "/swagger.json"})))))

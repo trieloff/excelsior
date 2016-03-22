@@ -69,6 +69,7 @@ the binary can be deployed in environments like AWS Lambda that do not support s
 * `AWS_SECRET_KEY` – your AWS secret key, required to access DynamoDB and S3
 * `DYNAMODB_ENDPOINT` – URL of the DynamoDB instance to use. For instance "https://dynamodb.eu-west-1.amazonaws.com" for the EU West [region](http://docs.aws.amazon.com/general/latest/gr/rande.html#ddb_region) or "http://localhost:8000" for a local development instance.The protocol must be included.
 * `DYNAMODB_CRYPT_KEY – encryption password for encrypted data storage in DynamoDB
+* `LAMBDA_ARN` – ARN for the Lambda endpoint where Excelsior will be running. This looks like `arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:<AWS_USER_UD>:function:excelsior-dev/invocations`
 
 ### Local Development
 

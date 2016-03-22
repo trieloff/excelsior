@@ -102,6 +102,7 @@
                   :return Spreadsheet
                   :path-params [customer :- String spreadsheet :- String]
                   :summary "calculate the response value"
+                  :swagger aws-gateway-options
                   (ok (let
                         [db (init)
                          meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
@@ -123,6 +124,7 @@
                    :body-params [inputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as input. Use cell references such as A1"})
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})]
                    :summary "Update input and output cells for a spreadsheet"
+                   :swagger aws-gateway-options
                    (ok (let [db (init)
                              meta (far/with-thaw-opts crypt-opts (far/get-item client-opts
                                             :spreadsheets {:customer customer
@@ -143,6 +145,7 @@
                                  outputs :- (js/field [String] {:collectionFormat "multi" :description "the cells that will be used as output. Use cell references such as A2"})
                                  name :- String]
                    :summary "Create a new spreadsheet"
+                   :swagger aws-gateway-options
                    (ok (let [db (init)
                              meta {:customer     customer
                                    :spreadsheet  (make-unique-name customer name)
@@ -159,6 +162,7 @@
                   :return [String]
                   :path-params [customer :- String]
                   :summary "List all spreadsheets for a customer"
+                  :swagger aws-gateway-options
                   (ok (map #(:spreadsheet %) (far/with-thaw-opts crypt-opts (far/query client-opts
                                                                 :spreadsheets {:customer [:eq customer]}))))))
   (context "/hello" []

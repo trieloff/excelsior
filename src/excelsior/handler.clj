@@ -166,6 +166,7 @@
       :return Message
       :query-params [name :- String]
       :summary "say hello"
+      :swagger aws-gateway-options
       (ok {:message (str "Tere, " name)}))
     (POST "/" []
       :return Message

@@ -166,3 +166,4 @@
       (ok {:message (str "Hallo, " name)}))))
 
 (defhandler excelsior.handler.Lambda app {})
+

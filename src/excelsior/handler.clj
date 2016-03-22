@@ -60,14 +60,6 @@
 
 (def init (memoize -init))
 
-(def aws-gateway-options { :x-amazon-apigateway-integration {
-                             :responses { :default { :statusCode "200"
-                                                     :responseTemplates { "application/json" "$input.json('$.body')" }}}
-                             :requestTemplates { "application/json" "{\n   \"stage\" : \"$context.stage\",\n   \"request-id\" : \"$context.requestId\",\n   \"api-id\" : \"$context.apiId\",\n   \"resource-path\" : \"$context.resourcePath\",\n   \"resource-id\" : \"$context.resourceId\",\n   \"path\": {\n     #foreach($path in $input.params().path.keySet())\n       \"$path\": \"$util.escapeJavaScript($input.params().path.get($path))\" #if($foreach.hasNext),\n       #end\n     #end\n   },\n   \"http-method\" : \"$context.httpMethod\",\n   \"source-ip\" : \"$context.identity.sourceIp\",\n   \"user-agent\" : \"$context.identity.userAgent\",\n   \"account-id\" : \"$context.identity.accountId\",\n   \"api-key\" : \"$context.identity.apiKey\",\n   \"caller\" : \"$context.identity.caller\",\n   \"user\" : \"$context.identity.user\",\n   \"user-arn\" : \"$context.identity.userArn\",\n   \"query-string\": {\n      #foreach($querystring in $input.params().querystring.keySet())\n        \"$querystring\": \"$util.escapeJavaScript($input.params().querystring.get($querystring))\" #if($foreach.hasNext),#end\n      #end\n   },\n   \"headers\": {\n      #foreach($header in $input.params().header.keySet())\n        \"$header\": \"$util.escapeJavaScript($input.params().header.get($header))\" #if($foreach.hasNext),#end\n      #end\n   },\n   \"body\" : $input.json('$')\n}" }
-                             :uri (env/env :lambda-arn)
-                             :httpMethod "POST"
-                             :type "aws" }})
-
 (defn is-unique-name? [customer name]
   (nil? (far/with-thaw-opts crypt-opts (far/get-item client-opts
                                              :spreadsheets
@@ -172,7 +164,13 @@
       :return Message
       :body-params [name :- String]
       :summary "say hello"
-      :swagger aws-gateway-options
+      :swagger { :x-amazon-apigateway-integration {
+                   :responses { :default { :statusCode "200"
+                                           :responseTemplates { "application/json" "$input.json('$.body')" }}}
+                   :requestTemplates { "application/json" "{\n   \"stage\" : \"$context.stage\",\n   \"request-id\" : \"$context.requestId\",\n   \"api-id\" : \"$context.apiId\",\n   \"resource-path\" : \"$context.resourcePath\",\n   \"resource-id\" : \"$context.resourceId\",\n   \"path\": {\n     #foreach($path in $input.params().path.keySet())\n       \"$path\": \"$util.escapeJavaScript($input.params().path.get($path))\" #if($foreach.hasNext),\n       #end\n     #end\n   },\n   \"http-method\" : \"$context.httpMethod\",\n   \"source-ip\" : \"$context.identity.sourceIp\",\n   \"user-agent\" : \"$context.identity.userAgent\",\n   \"account-id\" : \"$context.identity.accountId\",\n   \"api-key\" : \"$context.identity.apiKey\",\n   \"caller\" : \"$context.identity.caller\",\n   \"user\" : \"$context.identity.user\",\n   \"user-arn\" : \"$context.identity.userArn\",\n   \"query-string\": {\n      #foreach($querystring in $input.params().querystring.keySet())\n        \"$querystring\": \"$util.escapeJavaScript($input.params().querystring.get($querystring))\" #if($foreach.hasNext),#end\n      #end\n   },\n   \"headers\": {\n      #foreach($header in $input.params().header.keySet())\n        \"$header\": \"$util.escapeJavaScript($input.params().header.get($header))\" #if($foreach.hasNext),#end\n      #end\n   },\n   \"body\" : $input.json('$')\n}" }
+                   :uri (env/env :lambda-arn)
+                   :httpMethod "POST"
+                   :type "aws" }}
       (ok {:message (str "Hallo, " name)}))))
 
 (defhandler excelsior.handler.Lambda app {})

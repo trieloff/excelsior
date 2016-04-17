@@ -14,7 +14,10 @@
                    ".lein-env"] ; let's see if we can sneak the environment variables into the binary
   :plugins [[test2junit "1.1.2"]
             [lein-environ "1.0.2"]
+            [lein-aws-api-gateway "1.10.68-1"]
             [lein-maven-s3-wagon "0.2.5"]]
+  :api-gateway {:api-id "qlwy4ccaia"
+                :swagger "resources/swagger-example.json"}
   :test2junit-output-dir ~(or (System/getenv "CIRCLE_TEST_REPORTS") "target/test2junit")
   :env {:aws-access-key #=(eval (System/getenv "AWS_ACCESS_KEY"))
         :aws-secret-key #=(eval (System/getenv "AWS_SECRET_KEY"))

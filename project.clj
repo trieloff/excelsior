@@ -20,7 +20,7 @@
             ]
   :api-gateway {:api-id "qlwy4ccaia"
                 :swagger "resources/swagger-example.json"}
-                :swagger "target/swagger.json"}
+
   :test2junit-output-dir ~(or (System/getenv "CIRCLE_TEST_REPORTS") "target/test2junit")
   :env {:aws-access-key #=(eval (System/getenv "AWS_ACCESS_KEY"))
         :aws-secret-key #=(eval (System/getenv "AWS_SECRET_KEY"))

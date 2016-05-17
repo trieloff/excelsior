@@ -9,6 +9,4 @@ deployment:
   staging:
     branch: lambda-deploy
     commands:
-    - lein uberjar
-    - lein deploy private excelsior 0.1.0-SNAPSHOT target/server.jar
-    - sh deploy.sh
+    - lein lambda update dev

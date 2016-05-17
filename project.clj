@@ -16,8 +16,7 @@
             [lein-environ "1.0.2"]
             [lein-aws-api-gateway "1.10.68-1"]
             [lein-clj-lambda "0.4.0"]
-            ;[lein-maven-s3-wagon "0.2.5"]
-            ]
+            [lein-maven-s3-wagon "0.2.5"]]
   :api-gateway {:api-id "n0mn6xmgo7"
                 :swagger "target/swagger.json"}
 

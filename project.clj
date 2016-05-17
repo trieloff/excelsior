@@ -2,7 +2,7 @@
   :description "Turns Excel into HTTP"
   :url "https://github.com/trieloff/excelsior"
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [metosin/compojure-api "1.0.1"]
+                 [metosin/compojure-api "1.1.0"]
                  [com.taoensso/faraday "1.9.0-beta1"]
                  [environ "1.0.2"]
                  [amazonica "0.3.52"]

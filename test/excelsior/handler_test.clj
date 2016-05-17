@@ -2,7 +2,9 @@
   (:require [clojure.test :refer :all]
             [taoensso.faraday :as far]
             [dk.ative.docjure.spreadsheet :as doc]
-            [excelsior.handler :refer :all]))
+            [excelsior.handler :refer :all]
+            [cheshire.core :refer :all]
+            [clojure.walk :refer :all]))
 
 (far/describe-table client-opts :spreadsheets)
 
@@ -79,4 +81,9 @@
 (deftest swagger
   (is (not (nil? app)))
   (is (not (nil? (app {:request-method :get, :uri "/swagger.json"}))))
-  (spit "target/swagger.json" (slurp (:body (app {:request-method :get, :uri "/swagger.json"})))))
+  (spit "target/swagger.json" (generate-string (postwalk #(if (and (map? %) (get % "default") (= (get % "default") {"description" ""}))
+                                                            (assoc % 200 {:description "default response"})
+                                                            %) (parse-string (slurp (:body (app {:request-method :get, :uri "/swagger.json"}))))))))
+
+;(spit "target/swagger.json" (slurp (:body (app {:request-method :get, :uri "/swagger.json"}))))
+;(generate-string (postwalk #(if (and (map? %) (get % "default")) (assoc % 200 {:description "default response"}) %) (parse-string (slurp (:body (app {:request-method :get, :uri "/swagger.json"}))))))

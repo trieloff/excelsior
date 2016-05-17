@@ -61,13 +61,16 @@
 
 (def init (memoize -init))
 
-(def aws-gateway-options { :x-amazon-apigateway-integration {
-                             :responses { :default { :statusCode "200"
-                                                     :responseTemplates { "application/json" "$input.json('$.body')" }}}
-                             :requestTemplates { "application/json" (slurp (io/resource "bodymapping.vm")) }
-                             :uri (str "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/" (env/env :lambda-arn) "/invocations")
-                             :httpMethod "POST"
-                             :type "aws" }})
+(def aws-gateway-options {
+                           :x-amazon-apigateway-integration {
+                                                              :responses { :default { :statusCode "200"
+                                                                                      :responseTemplates { "application/json" "$input.json('$.body')" }}
+                                                                           }
+                                                              :requestTemplates { "application/json" (slurp (io/resource "bodymapping.vm")) }
+                                                              :uri (str "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/" (env/env :lambda-arn) "/invocations")
+                                                              ;:credentials "arn:aws:iam::320028119408:role/lambda-role"
+                                                              :httpMethod "POST"
+                                                              :type "aws" }})
 
 (defn is-unique-name? [customer name]
   (nil? (far/with-thaw-opts crypt-opts (far/get-item client-opts

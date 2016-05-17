@@ -65,7 +65,7 @@
                              :responses { :default { :statusCode "200"
                                                      :responseTemplates { "application/json" "$input.json('$.body')" }}}
                              :requestTemplates { "application/json" (slurp (io/resource "bodymapping.vm")) }
-                             :uri (env/env :lambda-arn)
+                             :uri (str "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/" (env/env :lambda-arn) "/invocations")
                              :httpMethod "POST"
                              :type "aws" }})
 

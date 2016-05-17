@@ -18,8 +18,8 @@
             [lein-clj-lambda "0.4.0"]
             ;[lein-maven-s3-wagon "0.2.5"]
             ]
-  :api-gateway {:api-id "arzz6rda99"
-                ;;:deploy "dev"
+  :api-gateway {:api-id "qlwy4ccaia"
+                :swagger "resources/swagger-example.json"}
                 :swagger "target/swagger.json"}
   :test2junit-output-dir ~(or (System/getenv "CIRCLE_TEST_REPORTS") "target/test2junit")
   :env {:aws-access-key #=(eval (System/getenv "AWS_ACCESS_KEY"))

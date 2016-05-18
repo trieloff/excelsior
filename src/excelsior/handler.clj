@@ -48,7 +48,8 @@
              (if (not (= status 200))
                {:status status
                 :error (if error error "Unknown error")}
-               (let [cellfunc (apply doc/cell-fn cell (first (doc/sheet-seq (doc/load-workbook body))) inputs)]
+               (let [debug (println "Preparing spreadsheet: " headers " " status " " inputs)
+                     cellfunc (apply doc/cell-fn cell (first (doc/sheet-seq (doc/load-workbook body))) inputs)]
                {:value (apply cellfunc values)
                 :staus status}))))
 

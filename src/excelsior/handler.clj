@@ -83,7 +83,9 @@
                      (ok output))))
           (GET "/:sheet/:cell" request
                :responses { 200 {:schema s/Any :description "Default response"}
-                            302 {:schema s/Any :description "Redirect to `continue` location"}}
+                            302 {:schema s/Any :description "Redirect to `continue` location"}
+                            500 {:schema {:code String}
+                     :description "Horror"}}
                :query-params [spreadsheet :- String continue :- String]
                :path-params [sheet :- Long cell :- String]
                :summary "Calculate response value from Redirect"

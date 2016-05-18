@@ -11,4 +11,4 @@ deployment:
     branch: lambda-deploy
     commands:
     - lein lambda update dev
-    - aws lambda add-permission --function-name excelsior-dev --statement-id lars-1 --action "lambda:*" --principal "apigateway.amazonaws.com"
+#    - aws lambda add-permission --function-name excelsior-dev --statement-id lars-1 --action "lambda:*" --principal "apigateway.amazonaws.com"

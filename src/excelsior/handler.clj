@@ -3,6 +3,7 @@
             [ring-aws-lambda-adapter.core :refer [defhandler]]
             [ring.util.http-response :refer :all]
             [dk.ative.docjure.spreadsheet :as doc]
+            [org.httpkit.client :as http]
             [excelsior.core :as env]
             [cheshire.core :refer :all]
             [clojure.java.io :as io]
@@ -34,6 +35,16 @@
     "choice" (-> value :choice :label)
     ((-> value :type keyword) value)))
 
+(defn calculate [spreadsheet-url cell inputs values]
+  (let [{:keys [status headers body error] :as string}
+                 @(http/get spreadsheet-url)]
+             (if (not (= status 200))
+               {:status status
+                :error error}
+               (let [cellfunc (apply doc/cell-fn cell (first (doc/sheet-seq (doc/load-workbook body))) inputs)]
+               {:value (apply cellfunc values)
+                :staus status}))))
+
 (defapi app
   {:ring-swagger {:ignore-missing-mappings? true}
    :swagger
@@ -51,14 +62,11 @@
                  (let [body (parse-string (slurp (:body request)) true)
                        answer (-> body :form_response :answers)
                        inputs (filter #(re-matches #"[A-Z]+[0-9]+" %) (-> request :query-params keys))
-                       cellfunc (apply doc/cell-fn cell (first (doc/sheet-seq (doc/load-workbook spreadsheet))) inputs)
+                       ;cellfunc (apply doc/cell-fn cell (first (doc/sheet-seq (doc/load-workbook spreadsheet))) inputs)
                        ;cellfunc (doc/cell-fn cell (nth (doc/sheet-seq (doc/load-workbook spreadsheet)) sheet) inputs)
                        fieldids (map #(get (-> request :query-params) %) inputs)
                        values (map clean-values (map (fn [fieldid] (first (filter #(= (-> % :field :id) fieldid) answer))) fieldids))]
-                   (ok {:spreadsheet spreadsheet
-                        :inputs inputs
-                        :values values
-                        :return (apply cellfunc values)})))
+                   (ok {:calculation (calculate spreadsheet cell inputs values)})))
           (GET "/" request
                 :return s/Any
                 :query-params [spreadsheet :- String]

@@ -64,7 +64,8 @@
             :description "A REST API for Spreadsheets"}}}}
   (context "/calculation" []
            (POST "/:sheet/:cell" request
-                 :return s/Any
+                 :responses { 200 {:schema s/Any}
+                              302 {:schema s/Any}}
                  :query-params [spreadsheet :- String continue :- [String]]
                  :path-params [sheet :- Long cell :- String]
                  :summary "Calculate response value from WebHook"
@@ -81,7 +82,8 @@
                      (not-found output)
                      (ok output))))
           (GET "/:sheet/:cell" request
-                :return s/Any
+               :responses { 200 {:schema s/Any}
+                            302 {:schema s/Any}}
                 :query-params [spreadsheet :- String continue :- String]
                 :path-params [sheet :- Long cell :- String]
                 :summary "Calculate response value from Redirect"

@@ -55,7 +55,7 @@
   (context "/calculation" []
            (POST "/:sheet/:cell" request
                  :return s/Any
-                 :query-params [spreadsheet :- String]
+                 :query-params [spreadsheet :- String continue :- [String]]
                  :path-params [sheet :- Long cell :- String]
                  :summary "Calculate response value from WebHook"
                  :swagger aws-gateway-options
@@ -66,10 +66,11 @@
                        ;cellfunc (doc/cell-fn cell (nth (doc/sheet-seq (doc/load-workbook spreadsheet)) sheet) inputs)
                        fieldids (map #(get (-> request :query-params) %) inputs)
                        values (map clean-values (map (fn [fieldid] (first (filter #(= (-> % :field :id) fieldid) answer))) fieldids))
-                       calculation (calculate spreadsheet cell inputs values)]
+                       calculation (calculate spreadsheet cell inputs values)
+                       output (assoc body :calculation calculation)]
                    (if (:error calculation)
-                     (not-found (assoc body :calculation calculation))
-                     (ok (assoc body :calculation calculation)))))
+                     (not-found output)
+                     (ok continue))))
           (GET "/" request
                 :return s/Any
                 :query-params [spreadsheet :- String]

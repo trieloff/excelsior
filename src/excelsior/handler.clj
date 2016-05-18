@@ -93,7 +93,7 @@
                        ;output (assoc body :calculation calculation)
                        ;continuation (continue-with output continue)
                       ]
-                   (found (str
+                   (ok (str
                                 (.getProtocol (java.net.URL. continue)) "://"
                                 (.getHost (java.net.URL. continue))
                                 (if (< 0 (.getPort (java.net.URL. continue))) (str ":" (.getPort (java.net.URL. continue))))

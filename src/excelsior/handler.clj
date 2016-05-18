@@ -7,6 +7,7 @@
             [dk.ative.docjure.spreadsheet :as doc]
             [ring.swagger.json-schema :as js]
             [excelsior.core :as env]
+            [cheshire.core :refer :all]
             [clojure.java.io :as io]
             [schema.core :as s]))
 
@@ -93,6 +94,8 @@
                           (vector (keyword %))
                           (apply doc/cell-fn % (first (doc/sheet-seq (doc/load-workbook sheet))) (sort inputs))) (sort outputs))))
 
+
+
 (defapi app
   {:ring-swagger {:ignore-missing-mappings? true}
    :swagger
@@ -100,6 +103,21 @@
     :spec "/swagger.json"
     :data {:info {:title "Excelsior"
             :description "A REST API for Spreadsheets"}}}}
+  (context "/calculation" []
+           (POST "/" request
+                 :return Message
+                 :query-params [spreadsheet :- String]
+                 :summary "Calculate response value from WebHook"
+                 :swagger aws-gateway-options
+                 (let [body (parse-string (slurp (:body request)) true)
+                       answer (-> body :form_response :answers first)]
+                   (ok {:message (str spreadsheet " body: " answer)})))
+          (GET "/" request
+                :return Message
+                :query-params [spreadsheet :- String]
+                :summary "Calculate response value from Redirect"
+                :swagger aws-gateway-options
+                (ok {:message spreadsheet})))
   (context "/formula" []
             (GET "/:customer/:spreadsheet" request
                   :return Spreadsheet

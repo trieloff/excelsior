@@ -45,6 +45,9 @@
                {:value (apply cellfunc values)
                 :staus status}))))
 
+(defn continue-with [body urls]
+  (pmap #(http/post % {:body (generate-string body)}) urls))
+
 (defapi app
   {:ring-swagger {:ignore-missing-mappings? true}
    :swagger
@@ -67,10 +70,11 @@
                        fieldids (map #(get (-> request :query-params) %) inputs)
                        values (map clean-values (map (fn [fieldid] (first (filter #(= (-> % :field :id) fieldid) answer))) fieldids))
                        calculation (calculate spreadsheet cell inputs values)
-                       output (assoc body :calculation calculation)]
+                       output (assoc body :calculation calculation)
+                       continuation (continue-with output continue)]
                    (if (:error calculation)
                      (not-found output)
-                     (ok continue))))
+                     (ok output))))
           (GET "/" request
                 :return s/Any
                 :query-params [spreadsheet :- String]

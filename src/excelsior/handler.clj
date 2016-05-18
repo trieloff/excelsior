@@ -81,7 +81,9 @@
                    (if (:error calculation)
                      (not-found output)
                      (ok output)))
-                   (catch Exception e (ok e))))
+                   (catch Exception e (do
+                                        (println e)
+                                        (ok e)))))
           (GET "/:sheet/:cell" request
                :responses { 200 {:schema s/Any :description "Default response"}
                             302 {:schema s/Any :description "Redirect to `continue` location"}

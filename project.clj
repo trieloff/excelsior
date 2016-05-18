@@ -4,6 +4,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [metosin/compojure-api "1.1.0"]
                  [environ "1.0.2"]
+                 [http-kit "2.1.19"]
                  [ring-aws-lambda-adapter "0.1.1"]
                  [dk.ative/docjure "1.11.0-SNAPSHOT"]]
   :ring {:handler excelsior.handler/app}

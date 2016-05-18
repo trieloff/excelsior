@@ -70,7 +70,7 @@
                  :path-params [sheet :- Long cell :- String]
                  :summary "Calculate response value from WebHook"
                  :swagger aws-gateway-options
-                 (let [body (parse-string (slurp (:body request)) true)
+                 (try (let [body (parse-string (slurp (:body request)) true)
                        answer (-> body :form_response :answers)
                        inputs (filter #(re-matches #"[A-Z]+[0-9]+" %) (-> request :query-params keys))
                        fieldids (map #(get (-> request :query-params) %) inputs)
@@ -80,7 +80,8 @@
                        continuation (continue-with output continue)]
                    (if (:error calculation)
                      (not-found output)
-                     (ok output))))
+                     (ok output)))
+                   (catch Exception e (ok e))))
           (GET "/:sheet/:cell" request
                :responses { 200 {:schema s/Any :description "Default response"}
                             302 {:schema s/Any :description "Redirect to `continue` location"}

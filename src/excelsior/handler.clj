@@ -29,11 +29,18 @@
 
 
 (defn clean-values [value]
-  (println value)
   (case (:type value)
     "rating" (:number value)
     "choice" (-> value :choice :label)
     ((-> value :type keyword) value)))
+
+(defn read-values [value]
+  (try (Float. value)
+    (catch Exception e
+      (cond
+        (re-matches #"(?i)true" value) true
+        (re-matches #"(?i)false" value) false
+        :default value))))
 
 (defn calculate [spreadsheet-url cell inputs values]
   (let [{:keys [status headers body error] :as string}
@@ -65,8 +72,6 @@
                  (let [body (parse-string (slurp (:body request)) true)
                        answer (-> body :form_response :answers)
                        inputs (filter #(re-matches #"[A-Z]+[0-9]+" %) (-> request :query-params keys))
-                       ;cellfunc (apply doc/cell-fn cell (first (doc/sheet-seq (doc/load-workbook spreadsheet))) inputs)
-                       ;cellfunc (doc/cell-fn cell (nth (doc/sheet-seq (doc/load-workbook spreadsheet)) sheet) inputs)
                        fieldids (map #(get (-> request :query-params) %) inputs)
                        values (map clean-values (map (fn [fieldid] (first (filter #(= (-> % :field :id) fieldid) answer))) fieldids))
                        calculation (calculate spreadsheet cell inputs values)
@@ -75,12 +80,22 @@
                    (if (:error calculation)
                      (not-found output)
                      (ok output))))
-          (GET "/" request
+          (GET "/:sheet/:cell" request
                 :return s/Any
-                :query-params [spreadsheet :- String]
+                :query-params [spreadsheet :- String continue :- String]
+                :path-params [sheet :- Long cell :- String]
                 :summary "Calculate response value from Redirect"
                 :swagger aws-gateway-options
-                (ok {:message spreadsheet})))
+                (let [body (parse-string (slurp (:body request)) true)
+                       inputs (filter #(re-matches #"[A-Z]+[0-9]+" %) (-> request :query-params keys))
+                       values (map read-values (map #(get (-> request :query-params) %) inputs))
+                       calculation (calculate spreadsheet cell inputs values)
+                       ;output (assoc body :calculation calculation)
+                       ;continuation (continue-with output continue)
+                      ]
+                   (found (str continue (ring.util.codec/form-encode(assoc
+                                    (apply assoc {} (interleave inputs values))
+                                    :value (:value calculation))))))))
   (context "/hello" []
     :tags ["hello"]
     (GET "/" []

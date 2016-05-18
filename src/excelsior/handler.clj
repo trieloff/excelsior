@@ -100,20 +100,6 @@
                                 (.getPath (java.net.URL. continue)) "?"
                                 (ring.util.codec/form-encode(merge (ring.util.codec/form-decode(.getQuery (java.net.URL. continue))) (assoc
                                     (apply assoc {} (interleave inputs values))
-                                    :value (:value calculation)))))) :status 200))))
-  (context "/hello" []
-    :tags ["hello"]
-    (GET "/" []
-      :return s/Any
-      :query-params [name :- String]
-      :summary "say hello"
-      :swagger aws-gateway-options
-      (ok {:message (str "Tere, " name)}))
-    (POST "/" []
-      :return s/Any
-      :body-params [name :- String]
-      :summary "say hello"
-      :swagger aws-gateway-options
-      (ok {:message (str "Hallo, " name)}))))
+                                    :value (:value calculation)))))) :status 200)))))
 
 (defhandler excelsior.handler.Lambda app {})

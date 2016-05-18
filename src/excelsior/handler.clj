@@ -64,7 +64,7 @@
             :description "A REST API for Spreadsheets"}}}}
   (context "/calculation" []
            (POST "/:sheet/:cell" request
-                 :responses { 200 {:schema {:event_id s/Str :event_type s/Str :form_response s/Any :calculation s/Any} :description "Default response (enriched post)"}
+                 :responses { 200 {:schema s/Any :description "Default response"}
                               302 {:schema s/Any :description "Redirect to `continue` location"}}
                  :query-params [spreadsheet :- String continue :- [String]]
                  :path-params [sheet :- Long cell :- String]

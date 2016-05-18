@@ -40,7 +40,7 @@
                  @(http/get spreadsheet-url)]
              (if (not (= status 200))
                {:status status
-                :error error}
+                :error (if error error "Unknown error")}
                (let [cellfunc (apply doc/cell-fn cell (first (doc/sheet-seq (doc/load-workbook body))) inputs)]
                {:value (apply cellfunc values)
                 :staus status}))))
@@ -65,8 +65,11 @@
                        ;cellfunc (apply doc/cell-fn cell (first (doc/sheet-seq (doc/load-workbook spreadsheet))) inputs)
                        ;cellfunc (doc/cell-fn cell (nth (doc/sheet-seq (doc/load-workbook spreadsheet)) sheet) inputs)
                        fieldids (map #(get (-> request :query-params) %) inputs)
-                       values (map clean-values (map (fn [fieldid] (first (filter #(= (-> % :field :id) fieldid) answer))) fieldids))]
-                   (ok {:calculation (calculate spreadsheet cell inputs values)})))
+                       values (map clean-values (map (fn [fieldid] (first (filter #(= (-> % :field :id) fieldid) answer))) fieldids))
+                       calculation (calculate spreadsheet cell inputs values)]
+                   (if (:error calculation)
+                     (not-found (assoc body :calculation calculation))
+                     (ok (assoc body :calculation calculation)))))
           (GET "/" request
                 :return s/Any
                 :query-params [spreadsheet :- String]

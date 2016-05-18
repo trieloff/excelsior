@@ -82,26 +82,26 @@
                      (not-found output)
                      (ok output))))
           (GET "/:sheet/:cell" request
-               :responses { 200 {:schema s/Any}
-                            302 {:schema s/Any}}
-                :query-params [spreadsheet :- String continue :- String]
-                :path-params [sheet :- Long cell :- String]
-                :summary "Calculate response value from Redirect"
-                :swagger aws-gateway-options
-                (let [body (parse-string (slurp (:body request)) true)
-                       inputs (filter #(re-matches #"[A-Z]+[0-9]+" %) (-> request :query-params keys))
-                       values (map read-values (map #(get (-> request :query-params) %) inputs))
-                       calculation (calculate spreadsheet cell inputs values)
-                       ;output (assoc body :calculation calculation)
-                       ;continuation (continue-with output continue)
-                      ]
-                   (assoc (found (str
-                                (.getProtocol (java.net.URL. continue)) "://"
-                                (.getHost (java.net.URL. continue))
-                                (if (< 0 (.getPort (java.net.URL. continue))) (str ":" (.getPort (java.net.URL. continue))))
-                                (.getPath (java.net.URL. continue)) "?"
-                                (ring.util.codec/form-encode(merge (ring.util.codec/form-decode(.getQuery (java.net.URL. continue))) (assoc
-                                    (apply assoc {} (interleave inputs values))
-                                    :value (:value calculation)))))) :status 200)))))
+               :responses { 200 {:schema s/Any :description "Default response"}
+                            302 {:schema s/Any :description "Redirect to `continue` location"}}
+               :query-params [spreadsheet :- String continue :- String]
+               :path-params [sheet :- Long cell :- String]
+               :summary "Calculate response value from Redirect"
+               :swagger aws-gateway-options
+               (let [body (parse-string (slurp (:body request)) true)
+                     inputs (filter #(re-matches #"[A-Z]+[0-9]+" %) (-> request :query-params keys))
+                     values (map read-values (map #(get (-> request :query-params) %) inputs))
+                     calculation (calculate spreadsheet cell inputs values)
+                     ;output (assoc body :calculation calculation)
+                     ;continuation (continue-with output continue)
+                     ]
+                 (assoc (found (str
+                                 (.getProtocol (java.net.URL. continue)) "://"
+                                 (.getHost (java.net.URL. continue))
+                                 (if (< 0 (.getPort (java.net.URL. continue))) (str ":" (.getPort (java.net.URL. continue))))
+                                 (.getPath (java.net.URL. continue)) "?"
+                                 (ring.util.codec/form-encode(merge (ring.util.codec/form-decode(.getQuery (java.net.URL. continue))) (assoc
+                                                                                                                                        (apply assoc {} (interleave inputs values))
+                                                                                                                                        :value (:value calculation)))))) :status 200)))))
 
 (defhandler excelsior.handler.Lambda app {})

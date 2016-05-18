@@ -68,13 +68,13 @@
   (context "/hello" []
     :tags ["hello"]
     (GET "/" []
-      :return Message
+      :return s/Any
       :query-params [name :- String]
       :summary "say hello"
       :swagger aws-gateway-options
       (ok {:message (str "Tere, " name)}))
     (POST "/" []
-      :return Message
+      :return s/Any
       :body-params [name :- String]
       :summary "say hello"
       :swagger aws-gateway-options

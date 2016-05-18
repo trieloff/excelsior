@@ -94,6 +94,13 @@
                           (vector (keyword %))
                           (apply doc/cell-fn % (first (doc/sheet-seq (doc/load-workbook sheet))) (sort inputs))) (sort outputs))))
 
+(defn clean-values [value]
+  (println value)
+  (case (:type value)
+    "rating" (:number value)
+    "choice" (-> value :choice :label)
+    ((-> value :type keyword) value)))
+
 (defapi app
   {:ring-swagger {:ignore-missing-mappings? true}
    :swagger
@@ -103,17 +110,19 @@
             :description "A REST API for Spreadsheets"}}}}
   (context "/calculation" []
            (POST "/:sheet/:cell" request
-                 :return Message
+                 :return s/Any
                  :query-params [spreadsheet :- String]
                  :path-params [sheet :- Long cell :- String]
                  :summary "Calculate response value from WebHook"
                  :swagger aws-gateway-options
                  (let [body (parse-string (slurp (:body request)) true)
-                       answer (-> body :form_response :answers first)
+                       answer (-> body :form_response :answers)
                        inputs (filter #(re-matches #"[A-Z]+[0-9]+" %) (-> request :query-params keys))
                        cellfunc (doc/cell-fn cell (nth (doc/sheet-seq (doc/load-workbook spreadsheet)) sheet) inputs)
-                       fieldids (map #(get (-> request :query-params) %) inputs)]
-                   (ok {:message (pr-str spreadsheet " body: " fieldids)})))
+                       fieldids (map #(get (-> request :query-params) %) inputs)
+                       values (map clean-values (map (fn [fieldid] (first (filter #(= (-> % :field :id) fieldid) answer))) fieldids))]
+                   (ok {:message spreadsheet
+                        :values values})))
           (GET "/" request
                 :return Message
                 :query-params [spreadsheet :- String]

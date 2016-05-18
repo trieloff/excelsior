@@ -94,8 +94,6 @@
                           (vector (keyword %))
                           (apply doc/cell-fn % (first (doc/sheet-seq (doc/load-workbook sheet))) (sort inputs))) (sort outputs))))
 
-
-
 (defapi app
   {:ring-swagger {:ignore-missing-mappings? true}
    :swagger
@@ -104,14 +102,18 @@
     :data {:info {:title "Excelsior"
             :description "A REST API for Spreadsheets"}}}}
   (context "/calculation" []
-           (POST "/" request
+           (POST "/:sheet/:cell" request
                  :return Message
                  :query-params [spreadsheet :- String]
+                 :path-params [sheet :- Long cell :- String]
                  :summary "Calculate response value from WebHook"
                  :swagger aws-gateway-options
                  (let [body (parse-string (slurp (:body request)) true)
-                       answer (-> body :form_response :answers first)]
-                   (ok {:message (str spreadsheet " body: " answer)})))
+                       answer (-> body :form_response :answers first)
+                       inputs (filter #(re-matches #"[A-Z]+[0-9]+" %) (-> request :query-params keys))
+                       cellfunc (doc/cell-fn cell (nth (doc/sheet-seq (doc/load-workbook spreadsheet)) sheet) inputs)
+                       fieldids (map #(get (-> request :query-params) %) inputs)]
+                   (ok {:message (pr-str spreadsheet " body: " fieldids)})))
           (GET "/" request
                 :return Message
                 :query-params [spreadsheet :- String]

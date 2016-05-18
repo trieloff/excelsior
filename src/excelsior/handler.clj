@@ -93,14 +93,14 @@
                        ;output (assoc body :calculation calculation)
                        ;continuation (continue-with output continue)
                       ]
-                   (ok (str
+                   (assoc (found (str
                                 (.getProtocol (java.net.URL. continue)) "://"
                                 (.getHost (java.net.URL. continue))
                                 (if (< 0 (.getPort (java.net.URL. continue))) (str ":" (.getPort (java.net.URL. continue))))
                                 (.getPath (java.net.URL. continue)) "?"
                                 (ring.util.codec/form-encode(merge (ring.util.codec/form-decode(.getQuery (java.net.URL. continue))) (assoc
                                     (apply assoc {} (interleave inputs values))
-                                    :value (:value calculation)))))))))
+                                    :value (:value calculation)))))) :status 200))))
   (context "/hello" []
     :tags ["hello"]
     (GET "/" []

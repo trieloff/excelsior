@@ -11,5 +11,3 @@ deployment:
     branch: lambda-deploy
     commands:
     - lein lambda update dev
-    - lein test
-    - lein aws-api-gateway update
